@@ -1,0 +1,73 @@
+micronaut:
+  application:
+    name: armmOrchestrationService
+  http:
+    services:
+      history-node:
+        url: ${HISTORY_NODE:`http://localhost:8080`}
+        read-timeout: 30s
+      transformer-node:
+        url: ${TRANSFORMER_NODE:`http://localhost:8080`}
+        read-timeout: 30s
+      hcs-node:
+        url: ${HCS_NODE:`http://localhost:8080`}
+        read-timeout: 30s
+      classification-node:
+        url: ${CLASSIFICATION_NODE:`http://localhost:8080`}
+        read-timeout: 30s
+      pricing-node:
+        url: ${PRICING_NODE:`http://localhost:8081`}
+        read-timeout: 30s
+datasources:
+  default:
+    url: jdbc:postgresql://${DB_NODE:`localhost`:5432`}/postgres?ApplicationName=armm
+    username: ${DB_USERNAME:`armm`}
+    password: ${DB_PASSWORD:`armm`}
+    driverClassName: org.postgresql.Driver
+    db-type: postgresql
+    #schema-generate: CREATE_DROP
+    dialect: POSTGRES
+    maximum-pool-size: 10
+    connection-timeout: 60000
+jpa:
+  default:
+    entity-scan:
+      packages: "com.tolamearth.armm.pipeline"
+    properties:
+      hibernate:
+        show_sql: ${SHOW_SQL:`false`}
+logger:
+  levels:
+    root: INFO
+    com.tolamearth: ${OCI_LOG_LEVEL:INFO}
+jackson:
+  serialization-inclusion: NON_NULL
+liquibase:
+  datasources:
+    default:
+      change-log: 'classpath:db/liquibase-changelog.xml'
+      drop-first: ${DROP_TABLES:`false`}
+netty:
+  default:
+    allocator:
+      max-order: 3
+pipeline:
+  pubsub:
+    project:
+      name: hem-integration-services
+    topics:
+      unlisted:
+        name: nft_details
+        listener: nft_details_listener
+      marketplace:
+        name: nft_marketplace_state
+        listener: marketplace_listener
+      general:
+        name: ntf_state_general
+        listener: general_listener
+      userdetails:
+        name: user_profile_details
+        listener: user_listener
+      classifier:
+        name: classifier
+        listener: class_listener

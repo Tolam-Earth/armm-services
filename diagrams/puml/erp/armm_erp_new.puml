@@ -1,0 +1,14 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+skinparam linetype ortho
+
+pricing_request ||..|{ request_nft
+request_nft ||..|{ request_groups
+request_groups }|..|| nft_pool_group
+nft_pool_group ||..|| pool_meta
+nft_pool_group ||..|| model_result
+model_result }|..|| model_version
+model_version }|..|| model
+
+@enduml

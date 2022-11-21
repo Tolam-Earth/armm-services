@@ -1,0 +1,3 @@
+id,model_id,name,is_active,is_primary,endpoint_id,created_ts,updated_ts
+8f2092d0-db9d-4e97-b58d-b4690a59ec74,a4626be4-4470-4251-8693-0cfda6436f1b,"0.0.0.0",True,True,1,1663962247,1663962247
+e6987ba7-7f78-440d-ad7e-cb3aeba91806,31270f09-cf63-4887-8ade-01995fac7964,"0.0.1",True,True,2,1663962247,1663962247

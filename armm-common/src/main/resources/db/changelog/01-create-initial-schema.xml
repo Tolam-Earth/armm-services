@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright 2022 Tolam Earth
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+  -->
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="1" author="naglicr">
+        <createTable tableName="token_attributes"
+                     remarks="Table with information of token classifications">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nft_id" type="varchar"/>
+            <column name="token_id" type="varchar"/>
+            <column name="serial_number" type="bigint"/>
+            <column name="transaction_id" type="varchar"/>
+            <column name="transaction_time" type="bigint"/>
+            <column name="minting_owner" type="varchar"/>
+            <column name="owner" type="varchar"/>
+            <column name="country" type="varchar"/>
+            <column name="first_subdivision" type="varchar"/>
+            <column name="project_category" type="varchar"/>
+            <column name="project_type" type="varchar"/>
+            <column name="vintage_year" type="int"/>
+            <column name="nft_age" type="int"/>
+            <column name="num_owners" type="int"/>
+            <column name="avg_price" type="decimal" defaultValueNumeric="0"/>
+            <column name="last_price" type="decimal"  defaultValueNumeric="0"/>
+            <column name="num_price_chg" type="int"  defaultValueNumeric="0"/>
+            <column name="nft_state" type="varchar"/>
+            <column name="token_pool_id" type="uuid"/>
+            <column name="name_pool" type="varchar" defaultValue="undefined"/>
+            <column name="pooling_version" type="varchar"/>
+            <column name="latitude" type="float"/>
+            <column name="longitude" type="float"/>
+        </createTable>
+        <createIndex indexName="nft_id_idx" tableName="token_attributes" unique="true">
+            <column name="nft_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2" author="naglicr">
+        <createTable tableName="pool_meta"
+                     remarks="Table of pool summary statistics">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="version_pool" type="varchar"/>
+            <column name="dt_pool" type="bigint"/>
+            <column name="name_pool" type="varchar" defaultValue="undefined"/>
+            <column name="attributes_pool" type="varchar"/>
+            <column name="category_pool" type="varchar" defaultValue="0"/>
+            <column name="mean_pool" type="varchar"/>
+            <column name="median_pool" type="varchar"/>
+            <column name="var_pool" type="varchar"/>
+            <column name="stdev_pool" type="varchar"/>
+            <column name="n_pool" type="int" defaultValueNumeric="0"/>
+            <column name="weight" type="decimal" />
+        </createTable>
+    </changeSet>
+    <changeSet id="3" author="naglicr">
+        <createTable tableName="pricing_request"
+                     remarks="Table tracks requests made by users for pricing">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="request_user" type="varchar"/>
+            <column name="timestamp_sec" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="4" author="naglicr">
+        <createTable tableName="request_nft"
+                     remarks="Table tracks which NFT IDs were included in the pricing request and what pool the NFT was a member of at the time of the request">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="request_id" type="uuid"/>
+            <column name="nft_token_id" type="varchar"/>
+            <column name="nft_serial_num" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="5" author="naglicr">
+        <createTable tableName="request_groups"
+                     remarks="Table contains information about original request price calculation and later price calculations">
+            <column name="request_nft_id" type="uuid">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_request_groups"/>
+            </column>
+            <column name="pool_group_id" type="uuid">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_request_groups"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="6" author="naglicr">
+        <createTable tableName="nft_pool_group"
+                     remarks="Table groups nfts based on choosen model">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pool_id" type="uuid"/>
+            <column name="model_result_id" type="uuid"/>
+            <column name="is_primary" type="boolean" defaultValueBoolean="false"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="7" author="naglicr">
+        <createTable tableName="model_result"
+                     remarks="Model results are stored in this table to track the price generated for a specific pool by a specific model version to support model research and development.">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="model_version_id" type="uuid"/>
+            <column name="min_price" type="bigint"/>
+            <column name="max_price" type="bigint"/>
+            <column name="timestamp_sec" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="8" author="naglicr">
+        <createTable tableName="model"
+                     remarks="This table gives Models a name and created datetime">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar"/>
+            <column name="model_type" type="varchar"/>
+            <column name="created_ts" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="9" author="naglicr">
+        <createTable tableName="model_version"
+                     remarks="This table tracks specific versions of models and which ones are active and primary">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="model_id" type="uuid"/>
+            <column name="name" type="varchar"/>
+            <column name="is_active" type="boolean" defaultValueBoolean="false"/>
+            <column name="is_primary" type="boolean" defaultValueBoolean="false"/>
+            <column name="endpoint_id" type="bigint"/>
+            <column name="created_ts" type="bigint"/>
+            <column name="updated_ts" type="bigint"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="10" author="naglicr">
+        <createTable tableName="rules"
+                     remarks="This table tracks specific versions of models and which ones are active and primary">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="rule_name" type="varchar"/>
+            <column name="file_name" type="varchar"/>
+            <column name="rule" type="bytea"/>
+            <column name="created_ts" type="timestamp" defaultValueDate="now()"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="11" author="moorej">
+        <loadData tableName="pool_meta" file="data/pool_meta.csv"/>
+    </changeSet>
+    <changeSet id="12" author="nassar">
+        <createTable tableName="trader_user_config"
+                     remarks="This table has configuration for option for the trader service">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="config_name" type="varchar" />
+            <column name="config_value" type="varchar" />
+        </createTable>
+    </changeSet>
+    <changeSet id="13" author="moorej">
+        <loadData tableName="model" file="data/model.csv"/>
+        <loadData tableName="model_version" file="data/model_version.csv"/>
+    </changeSet>
+    <changeSet id="14" author="naglicr">
+        <createTable tableName="demo_history"
+                     remarks="This table contains histroy data for tests">
+            <column name="id" type="uuid" >
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="token_id" type="varchar" />
+            <column name="serial_number" type="bigint" />
+            <column name="transaction_id" type="varchar" />
+            <column name="transaction_time" type="bigint" />
+            <column name="msg_type" type="varchar" />
+            <column name="owner" type="varchar" />
+            <column name="price" type="bigint" />
+        </createTable>
+    </changeSet></databaseChangeLog>

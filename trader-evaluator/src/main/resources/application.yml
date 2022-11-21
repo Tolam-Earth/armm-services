@@ -1,0 +1,48 @@
+micronaut:
+  application:
+    name: armmTraderService
+  http:
+    services:
+      integration-buy-node:
+        url: ${INTEGRATION_NODE:`http://localhost:8080`}
+        read-timeout: 30s
+  server:
+    port: 8082
+datasources:
+  default:
+    url: jdbc:postgresql://${DB_NODE:`localhost`:5432`}/postgres?ApplicationName=armm
+    username: ${DB_USERNAME:`armm`}
+    password: ${DB_PASSWORD:`armm`}
+    driverClassName: org.postgresql.Driver
+    db-type: postgresql
+    #schema-generate: CREATE_DROP
+    dialect: POSTGRES
+    maximum-pool-size: 4
+    connection-timeout: 60000
+logger:
+  levels:
+    root: INFO
+    com.tolamearth: ${OCI_LOG_LEVEL:INFO}
+jackson:
+  serialization-inclusion: NON_NULL
+jpa:
+  default:
+    entity-scan:
+      packages: "com.tolamearth.armm.pipeline.entities,com.tolamearth.armm.trader.entities"
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: none
+        show_sql: true
+netty:
+  default:
+    allocator:
+      max-order: 3
+trader:
+  pubsub:
+    project:
+      name: hem-integration-services
+    topics:
+      marketplace:
+        name: nft_marketplace_state
+        listener: marketplace_listener

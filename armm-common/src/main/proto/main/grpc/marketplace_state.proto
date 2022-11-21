@@ -1,0 +1,42 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+option java_package = "com.tolamearth.armm.trader";
+option java_multiple_files = true;
+option java_outer_classname = "ArmmMessage";
+
+message MarketplaceState {
+    EventType eventType = 1;
+    NftId nftId = 2;
+    string owner = 3;
+    string projectCategory = 4;
+    uint64 listingPrice = 5;
+    uint64 minPrice = 6;
+    uint64 maxPrice = 7;
+    string transactionId = 8;
+    google.protobuf.Timestamp transactionTime = 9;
+    string country = 10;
+    string firstSubdivision = 11;
+    float longitude = 12;
+    float latitude = 13;
+    string projectType = 14;
+    uint64 vintageYear = 15;
+    string tokenPoolId = 16;
+
+    enum EventType {//Types of transactions from Hedera
+        MINTED = 0;
+        LISTED = 1;
+        PURCHASED = 2;
+        UNLISTED = 3;
+        RETIRED = 4;
+        RETRACTED = 5;
+        TRANSFERRED = 6;
+        BURNED = 7;
+    }
+
+    message NftId {
+        string tokenId = 1;         // Token ID in the format shard.realm.num
+        uint64 serialNumber = 2;    // Serial Number
+    }
+
+}

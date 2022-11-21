@@ -1,0 +1,46 @@
+micronaut:
+  application:
+    name: armmPricingService
+  http:
+    services:
+      classification-node:
+        url: ${CLASSIFICATION_NODE:`http://localhost:8080`}
+        read-timeout: 30s
+datasources:
+  default:
+    url: 'jdbc:h2:mem:armmdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE;MODE=PostgreSQL'
+    username: 'sa'
+    password: ''
+    driverClassName: 'org.h2.Driver'
+liquibase:
+  datasources:
+    default:
+      change-log: 'classpath:db/liquibase-changelog.xml'
+      drop-first: ${DROP_TABLES:`true`}
+logger:
+  levels:
+    root: INFO
+    com.tolamearth: ${OCI_LOG_LEVEL:INFO}
+jackson:
+  serialization-inclusion: NON_NULL
+jpa:
+  default:
+    entity-scan:
+      packages: "com.tolamearth.armm.pipeline"
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: none
+        show_sql: true
+netty:
+  default:
+    allocator:
+      max-order: 3
+pricing:
+  pubsub:
+    project:
+      name: hem-integration-services
+    topics:
+      classificator:
+        name: classification
+        listener: classification_listener

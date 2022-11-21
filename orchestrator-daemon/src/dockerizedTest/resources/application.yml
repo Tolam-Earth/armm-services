@@ -1,0 +1,66 @@
+micronaut:
+  application:
+    name: armmOrchestrationService
+  http:
+    services:
+      history-node:
+        url: https://history.com
+        read-timeout: 30s
+        log-level: debug
+      transformer-node:
+        url: http://localhost:8000
+        read-timeout: 30s
+      hcs-node:
+        url: https://hcs.com
+        read-timeout: 30s
+logger:
+  levels:
+    com.tolamearth: DEBUG
+jackson:
+  serialization-inclusion: NON_NULL
+datasources:
+  default:
+    url: 'jdbc:h2:mem:armmdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE;MODE=PostgreSQL'
+    username: 'sa'
+    password: ''
+    driverClassName: 'org.h2.Driver'
+jpa:
+  default:
+    entity-scan:
+      packages: "com.tolamearth.armm.pipeline"
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: none
+        show_sql: true
+liquibase:
+  datasources:
+    default:
+      change-log: 'classpath:db/liquibase-changelog.xml'
+      drop-first: ${DROP_TABLES:`true`}
+netty:
+  default:
+    allocator:
+      max-order: 3
+pipeline:
+  pubsub:
+    project:
+      name: hem-integration-services
+    topics:
+      unlisted:
+        name: nft_details
+        listener: nft_details_listener
+      marketplace:
+        name: nft_marketplace_state
+        listener: marketplace_listener
+      general:
+        name: ntf_state_general
+        listener: general_listener
+      userdetails:
+        name: user_profile_details
+        listener: user_listener
+      classifier:
+        name: classifier
+        listener: class_listener
+  features:
+    send-to-trader: true

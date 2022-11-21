@@ -1,0 +1,38 @@
+micronaut:
+  application:
+    name: armmPricingService
+  http:
+    services:
+      pricemodel-node:
+        url: ${PRICEMODEL_NODE:`http://localhost:8081`}
+        read-timeout: 30s
+  server:
+    port: 8081
+logger:
+  levels:
+    root: INFO
+    com.tolamearth: ${OCI_LOG_LEVEL:INFO}
+jackson:
+  serialization-inclusion: NON_NULL
+jpa:
+  default:
+    entity-scan:
+      packages: "com.tolamearth.armm.pipeline"
+    properties:
+      hibernate:
+        show_sql: ${SHOW_SQL:`false`}
+netty:
+  default:
+    allocator:
+      max-order: 3
+datasources:
+  default:
+    url: jdbc:postgresql://${DB_NODE:`localhost`:5432`}/postgres?ApplicationName=armm
+    username: ${DB_USERNAME:`armm`}
+    password: ${DB_PASSWORD:`armm`}
+    driverClassName: org.postgresql.Driver
+    db-type: postgresql
+    #schema-generate: CREATE_DROP
+    dialect: POSTGRES
+    maximum-pool-size: 4
+    connection-timeout: 60000

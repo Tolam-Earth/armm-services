@@ -1,0 +1,141 @@
+
+version: "3.3"
+
+services:
+  ingestion_orchestrator:
+    image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/orchestrator-daemon:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_NODE=database:5432
+      - GOOGLE_CLOUD_PROJECT=hem-integration-services
+      - PUBSUB_EMULATOR_HOST=pubsub:8681
+      - TRANSFORMER_NODE=http://172.20.0.1:8000
+      - CLASSIFICATION_NODE=http://172.20.0.1:8010
+      - HISTORY_NODE=http://172.20.0.1:8089
+      - PRICING_NODE=http://172.20.0.1:8081
+      - DROP_TABLES=true
+      - OCI_LOG_LEVEL=DEBUG
+    depends_on:
+      - pubsub
+      - database
+      - classification
+      - transformation
+    networks:
+      armm-network:
+        ipv4_address: 172.20.0.11
+
+  pricing_orchestrator:
+    image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/pricing-daemon:latest
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_NODE=database:5432
+      - PRICEMODEL_NODE=http://172.20.0.1:8002
+      - SHOW_SQL=true
+      - OCI_LOG_LEVEL=DEBUG
+    networks:
+      armm-network:
+        ipv4_address: 172.20.0.12
+    depends_on:
+      - database
+      - pricing_model
+
+  trader:
+    image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/trader-evaluator:latest
+    ports:
+      - "8085:8082"
+    environment:
+      - DB_NODE=database:5432
+      - GOOGLE_CLOUD_PROJECT=hem-integration-services
+      - PUBSUB_EMULATOR_HOST=pubsub:8681
+      - INTEGRATION_NODE=http://172.20.0.1:8089
+      - SHOW_SQL=true
+      - OCI_LOG_LEVEL=DEBUG
+    networks:
+      armm-network:
+        ipv4_address: 172.20.0.13
+    depends_on:
+      - database
+      - integration_orchestrator
+      - ingestion_orchestrator
+      - pricing_model
+
+  integration_orchestrator:
+    image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/integration-orchestrator:latest
+    environment:
+      - GOOGLE_CLOUD_PROJECT=hem-integration-services
+      - PUBSUB_EMULATOR_HOST=pubsub:8681
+      - API_HEM_MARKETPLACE_CLIENT_URL=
+    ports:
+      - "8089:8080"
+    depends_on:
+      - pubsub
+      - database
+#      - ingestion_orchestrator
+    networks:
+      armm-network:
+        ipv4_address: 172.20.0.19
+
+
+  classification:
+    image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/nft-classifier:latest
+    ports:
+      - "8010:8080"
+    networks:
+      armm-network:
+        ipv4_address: 172.20.0.14
+
+  transformation:
+    image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/nft-transformer:latest
+    ports:
+      - "8000:8080"
+    networks:
+      armm-network:
+        ipv4_address: 172.20.0.15
+
+  pubsub:
+    image: thekevjames/gcloud-pubsub-emulator:latest
+    environment:
+      - PUBSUB_PROJECT1=hem-integration-services,nft_details:nft_details_listener,classifier:class_listener,nft_marketplace_state:marketplace_listener,pub_nft_marketplace_state:pub_nft_marketplace_state_subscription
+    ports:
+      - "8681:8432"
+    networks:
+      armm-network:
+        ipv4_address: 172.20.0.16
+
+  database:
+    image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/hem-postgres:latest
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: armm
+      POSTGRES_PASSWORD: armm
+      POSTGRES_DB: armm
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+    networks:
+      armm-network:
+        ipv4_address: 172.20.0.17
+
+  pricing_model:
+    image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/nft-pricing:latest
+    ports:
+      - "8002:8080"
+    networks:
+      armm-network:
+        ipv4_address: 172.20.0.18
+
+volumes:
+  database_data:
+    driver: local
+
+networks:
+  armm-network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

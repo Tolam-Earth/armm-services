@@ -1,0 +1,110 @@
+# Install gcloud client
+https://cloud.google.com/sdk/docs/install
+
+# Install PostgreSQL Docker Container (Linux)
+`sudo apt install docker-compose`
+
+## install and run postgresql database
+`docker-compose -f "path to harmm project"/mmp/docker-compose-postgresql.yml up -d`
+
+# Install PostgreSQL Docker Container (Mac)
+Given that Docker Desktop on Mac requires a commercial license, we will instead use Podman to start up a Postgres 
+database container.
+
+## Install Podman
+Please follow instructions at https://podman.io/getting-started/installation
+
+## Create pod
+`podman pod create --name postgre-sql -p 5432:5432`
+
+## Pull Postgres 14 image
+`podman pull docker.io/library/postgres:14`
+
+## Run Postgres in pod
+```
+podman run --name postgres --pod=postgre-sql -d \
+-e POSTGRES_USER=armm \
+-e POSTGRES_PASSWORD=armm \
+docker.io/library/postgres:14
+```
+
+# Install and run Google PubSub Emulator
+## https://hub.docker.com/r/thekevjames/gcloud-pubsub-emulator
+```
+docker run --rm -it \
+-p 8681:8681 \
+-e PUBSUB_PROJECT1=hem-integration-services,nft_details:nft_details_listener,classifier:class_listener,nft_marketplace_state:marketplace_listener \
+thekevjames/gcloud-pubsub-emulator:latest
+```
+
+# Initialize gcloud authentication
+`gcloud auth configure-docker us-central1-docker.pkg.dev`
+
+# Install and run Transformer Service
+`docker run --rm -p 8000:8080 -it --tty --workdir /app --name nft-transformer us-central1-docker.pkg.dev/armm-sandbox/hem-armm/nft-transformer`
+
+# Install and run Orchestration Service
+```
+docker run --rm -p 8080:8080 -it --tty \
+--workdir /home/app --name pipeline-orchestrator \
+-e DB_NODE=[local_ip_address]:5432 \
+-e GOOGLE_CLOUD_PROJECT=hem-integration-services \
+-e PUBSUB_EMULATOR_HOST=[local_ip_address]:8681 \
+-e DROP_TABLES=true \
+us-central1-docker.pkg.dev/armm-sandbox/hem-armm/orchestrator-daemon
+```
+
+## set for external Transformer service
+`TRANSFORMER_NODE=http://localhost:8000`
+## set for external History service
+`HISTORY_NODE=http://localhost:9999`
+## set for external Classification service
+`CLASSIFICATION_NODE=httpo://localhost:7777`
+## set for Pricing service
+`PRICING_NODE=localhost:8081`
+## set for external Hedera ?  service
+`HCS_NODE=localhost:8811`
+## drop db tables on start
+`DROP_TABLES=true`
+## set log level
+`OCI_LOG_LEVEL=DEBUG`
+## show sql
+`SHOW_SQL=TRUE`
+
+# Example: Orchestration with external Transformation Service running in docker
+```
+docker run --rm -p 8080:8080 -it --tty \
+--workdir /home/app --name pipeline-orchestrator \
+-e DB_NODE=[local_ip_address]:5432 \
+-e GOOGLE_CLOUD_PROJECT=hem-integration-services \
+-e PUBSUB_EMULATOR_HOST=[local_ip_address]:8681 \
+-e TRANSFORMER_NODE=http://[local_ip_address]:8000 \
+-e DROP_TABLES=true \
+us-central1-docker.pkg.dev/armm-sandbox/hem-armm/orchestrator-daemon
+```
+
+
+## Example requests ---------------
+curl --location --request POST 'http://localhost:8080/pubsub/publish' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "details": [
+        {
+            "msgType": "MINTED",
+            "tokenId": "0.0.0",
+            "serialNumber": "8",
+            "transactionId": "1234",
+            "transactionTime": "2022-08-05T09:53:00.000Z",
+            "country": "USA",
+            "deviceId": "Solar Cell",
+            "firstSubdivision": "1",
+            "guardianId": "24234234",
+            "newOwner": "New Owner 1",
+            "quality": 7,
+            "projectCategory": "Kategory super",
+            "transactionMemo": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi lacus ex, euismod vitae cursus vel, congue quis massa. Nullam auctor ante ac mattis maximus. Phasellus tincidunt maximus elit sit amet malesuada. In hac habitasse platea dictumst. Proin imperdiet ultrices eros nec fringilla. Proin interdum mauris a dui tempus, quis rutrum dolor porta. Quisque sed eros sed mauris gravida vehicula eget commodo arcu. Duis dui ex, efficitur at ultricies ac, molestie non enim. Vivamus fermentum elit et pharetra tempus. Praesent consectetur vulputate dolor id ornare.",
+            "projectType": "Type 1"
+        }
+    ]
+}'
+

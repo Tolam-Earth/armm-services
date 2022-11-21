@@ -1,0 +1,8 @@
+micronaut:
+  application:
+    name: armmOrchestrationService
+jackson:
+  serialization-inclusion: NON_NULL
+pipeline:
+  features:
+    send-to-trader: true

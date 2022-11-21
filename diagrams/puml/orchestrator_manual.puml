@@ -1,0 +1,42 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+queue       nft_topic       as nfttopic
+queue       class_topic     as clastopic
+database    Redis           as redis
+database    DB              as db
+
+[-> nfttopic: push
+note right
+From Integration Service
+end note
+nfttopic --> OrchestratorDaemon: send
+OrchestratorDaemon -> OrchestratorDaemon: decompose
+note right
+Create n objects
+end note
+loop in batch of 1000
+    OrchestratorDaemon -> clastopic: push
+end
+loop repeat method handlePipeline n times in parallel
+clastopic --> OrchestratorDaemon: send
+OrchestratorDaemon <-> redis: exists?
+OrchestratorDaemon -> clastopic: ack if exists
+OrchestratorDaemon <-> IntegrationService: getHistory
+OrchestratorDaemon <-> DataTransformer: transform
+OrchestratorDaemon <-> ClassiificationService: getClassificationResult
+OrchestratorDaemon <-> db: save
+note right
+Save classification result
+end note
+OrchestratorDaemon <-> redis: saveWithTTL
+note right
+Save with Time To LIve
+end note
+OrchestratorDaemon -> clastopic: ack
+end
+
+
+
+@enduml
