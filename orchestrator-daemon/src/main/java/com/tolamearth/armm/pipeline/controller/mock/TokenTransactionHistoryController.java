@@ -22,6 +22,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ public class TokenTransactionHistoryController {
         this.historyRepository = historyRepository;
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Get("/integration/v1/offsets/{token_id},{serial_num}/transactions")
     public TokenHistoryClient.TokenHistoryResponse getTokensHistory(
             @PathVariable("token_id") String tokenId,

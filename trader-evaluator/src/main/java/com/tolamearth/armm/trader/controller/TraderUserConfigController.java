@@ -20,6 +20,8 @@ import com.tolamearth.armm.pipeline.entities.TraderUserConfig;
 import com.tolamearth.armm.trader.service.TraderUserConfigService;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import static com.tolamearth.armm.pipeline.enums.TraderUserConfigName.BUY_ON;
 import static com.tolamearth.armm.pipeline.enums.TraderUserConfigValue.FALSE;
@@ -34,17 +36,18 @@ public class TraderUserConfigController {
         this.traderUserConfigService = traderUserConfigService;
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Post("/buyOn")
     TraderUserConfig buyOn() {
         TraderUserConfig traderUserConfig = traderUserConfigService.findConfigAndSet(BUY_ON, TRUE);
         return traderUserConfig;
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Post("/buyOff")
     TraderUserConfig buyOff() {
         TraderUserConfig traderUserConfig = traderUserConfigService.findConfigAndSet(BUY_ON, FALSE);
         return traderUserConfig;
     }
-
 
 }

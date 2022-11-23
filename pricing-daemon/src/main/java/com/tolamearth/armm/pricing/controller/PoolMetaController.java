@@ -26,6 +26,8 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Put;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -43,22 +45,26 @@ public class PoolMetaController {
         this.poolMetaRepository = poolMetaRepository;
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Get("/{id}")
     public Optional<PoolMeta> findPoolMetaById(UUID id) {
         return poolMetaRepository.findById(id);
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Get("/list")
     public List<PoolMeta> list(@Valid Pageable pageable) {
         return poolMetaRepository.findAll(pageable).getContent();
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Get("/latest")
     public PoolMeta latest() {
         Pageable pageable = Pageable.from(0, 1, Sort.of(Sort.Order.desc("dtPool")));
         return poolMetaRepository.findAll(pageable).getContent().get(0);
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Put("/updateWeight")
     public HttpResponse updateWeight(@Body PoolMetaUpdateWeightCommand poolMetaUpdateWeightCommand) {
         poolMetaRepository.update(poolMetaUpdateWeightCommand.getId(), Instant.now().getEpochSecond(), poolMetaUpdateWeightCommand.getWeight());

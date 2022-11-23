@@ -24,6 +24,8 @@ import com.tolamearth.armm.pipeline.repository.SummaryRepository;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.QueryValue;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,7 @@ public class OrchestratorController {
         this.objectMapper = objectMapper;
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Get("/summary")
     public TokenAttributesSummary attributesSummary(@QueryValue("name") String name) throws JsonProcessingException {
         Summary summary = summaryRepository.findBySummaryName(name, LockModeType.OPTIMISTIC);

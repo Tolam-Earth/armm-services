@@ -21,6 +21,8 @@ import com.tolamearth.integration.armm.ArmmEvent;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,6 +30,7 @@ import java.util.List;
 @Controller
 public class TransformerMockController {
 
+    @ExecuteOn(TaskExecutors.IO)
     @Post("/arm/v1/data_transformer")
     DataTransformerClient.TransformationResponse transformData(@Body DataTransformerClient.TransformationRequest assets) {
         return new DataTransformerClient.TransformationResponse(

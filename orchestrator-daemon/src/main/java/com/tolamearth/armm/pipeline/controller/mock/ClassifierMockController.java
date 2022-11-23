@@ -21,6 +21,8 @@ import com.tolamearth.armm.pipeline.services.ClassificationServiceClient;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +30,7 @@ import java.util.UUID;
 @Controller
 public class ClassifierMockController {
 
+    @ExecuteOn(TaskExecutors.IO)
     @Post("/arm/v1/classification/scheduled-pool")
     ClassificationServiceClient.ClassificationResponse classify(@Body ClassificationServiceClient.ClassificationRequest classificationRequest) {
         return new ClassificationServiceClient.ClassificationResponse(

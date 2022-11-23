@@ -25,6 +25,8 @@ import com.tolamearth.armm.pipeline.repository.ClassificationDataRepository;
 import com.tolamearth.integration.armm.ArmmEvent;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,7 @@ public class PubSubController {
         this.historyRepository = historyRepository;
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Post("/publish")
     void publishMsg(@Body TokenDetailsDTO tokenDetailsDTO) {
         log.info("********************************** \n{}", tokenDetailsDTO);
@@ -142,6 +145,7 @@ public class PubSubController {
         }
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Get("/{id}")
     HttpResponse<TokenDetailDTO> getById(@PathVariable("id") String nftId) {
         Optional<TokenAttributes> classification = dataRepository.findByNftId(nftId);

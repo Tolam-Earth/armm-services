@@ -30,6 +30,8 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Error;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,7 @@ public class PricingController {
         this.pricingService = pricingService;
     }
 
+    @ExecuteOn(TaskExecutors.IO)
     @Post("/price")
     HttpResponse<PricingResponse> getTokenPricesInfo(@Body PricingRequestDTO pricingRequestDTO) {
         log.debug("Request on /armm/v1/price \n{}", pricingRequestDTO);

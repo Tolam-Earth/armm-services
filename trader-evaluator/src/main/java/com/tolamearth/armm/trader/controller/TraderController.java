@@ -26,6 +26,8 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Error;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.multipart.CompletedFileUpload;
+import io.micronaut.scheduling.TaskExecutors;
+import io.micronaut.scheduling.annotation.ExecuteOn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +45,7 @@ public class TraderController {
     }
 
 
+    @ExecuteOn(TaskExecutors.IO)
     @Post(value = "/rules/upload", consumes = MediaType.MULTIPART_FORM_DATA, produces = MediaType.TEXT_PLAIN)
     public HttpResponse<String> uploadRule(@QueryValue("ruleName") String ruleName, @Part("file") CompletedFileUpload fileUpload) throws IOException {
         log.debug("****************** uploadRule");
