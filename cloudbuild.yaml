@@ -2,3 +2,10 @@ steps:
   - name: gradle:jdk17
     entrypoint: gradle
     args: [ 'dockerizedTest','test' ]
+timeout: 1200s
+logsBucket: 'gs://tolam-core-2840_cloudbuild/armm-services-pr'
+options:
+  logging: GCS_ONLY
+tags:
+  - pull-request
+  - armm-services
