@@ -24,6 +24,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.11
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   pricing_orchestrator:
     image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/pricing-daemon:latest
@@ -40,6 +43,9 @@ services:
     depends_on:
       - database
       - pricing_model
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   trader:
     image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/trader-evaluator:latest
@@ -60,6 +66,9 @@ services:
       - integration_orchestrator
       - ingestion_orchestrator
       - pricing_model
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   integration_orchestrator:
     image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/integration-orchestrator:latest
@@ -76,6 +85,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.19
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
 
   classification:
@@ -85,6 +97,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.14
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   transformation:
     image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/nft-transformer:latest
@@ -93,6 +108,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.15
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   pubsub:
     image: thekevjames/gcloud-pubsub-emulator:latest
@@ -103,6 +121,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.16
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   database:
     image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/hem-postgres:latest
@@ -121,6 +142,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.17
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   pricing_model:
     image: us-central1-docker.pkg.dev/armm-sandbox/hem-armm/nft-pricing:latest
@@ -129,6 +153,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.18
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
 volumes:
   database_data:
