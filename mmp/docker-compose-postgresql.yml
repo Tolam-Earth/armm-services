@@ -12,3 +12,6 @@ services:
       POSTGRES_DB: armm
     volumes:
       - ./data:/var/lib/postgresql/data\
+    security_opt:
+      - no-new-privileges:true
+    read_only: true

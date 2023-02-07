@@ -24,6 +24,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.11
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   pricing_orchestrator:
     image: pricing-daemon:latest
@@ -40,6 +43,9 @@ services:
     depends_on:
       - database
       - pricing_model
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   trader:
     image: trader-evaluator:latest
@@ -60,6 +66,9 @@ services:
       - integration_orchestrator
       - ingestion_orchestrator
       - pricing_model
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   integration_orchestrator:
     image: integration-orchestrator:latest
@@ -82,6 +91,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.19
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
 
   classification:
@@ -91,6 +103,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.14
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   transformation:
     image: nft-transformer:latest
@@ -99,6 +114,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.15
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   pricing_model:
     image: nft-pricing:latest
@@ -107,6 +125,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.18
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   pubsub:
     image: thekevjames/gcloud-pubsub-emulator:latest
@@ -117,6 +138,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.16
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
   database:
     image: postgres:14.5-bullseye
@@ -135,6 +159,9 @@ services:
     networks:
       armm-network:
         ipv4_address: 172.20.0.17
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
 
 volumes:
   database_data:
